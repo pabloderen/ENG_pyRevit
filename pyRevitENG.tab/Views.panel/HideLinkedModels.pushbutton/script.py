@@ -23,7 +23,7 @@ doc = uidoc.Document
 logger = script.get_logger()
 logger.set_quiet_mode()
 
-collector = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_RvtLinks).ToElements()
+collector = FilteredElementCollector(doc, doc.ActiveView.Id).OfCategory(BuiltInCategory.OST_RvtLinks).ToElements()
 cat = None
 for i in collector:
     cat = i.Category
