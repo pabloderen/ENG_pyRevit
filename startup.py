@@ -93,4 +93,4 @@ app.DocumentChanged -= SaveChangeJournal
 app.DocumentChanged += SaveChangeJournal
 
 
-print('Startup script execution test.')
+#print('Startup script execution test.')
