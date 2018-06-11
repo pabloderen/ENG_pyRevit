@@ -23,14 +23,12 @@ doc = uidoc.Document
 logger = script.get_logger()
 logger.set_quiet_mode()
 
-collector = FilteredElementCollector(doc, doc.ActiveView.Id).OfCategory(BuiltInCategory.OST_RvtLinks).ToElements()
-cat = None
-for i in collector:
-    cat = i.Category
-if cat is not None:
-    t = Transaction(doc,'Hide Links')
-    t.Start()
-    doc.ActiveView.HideCategoryTemporary(cat.Id)
-    t.Commit()
+collector = FilteredElementCollector(doc, doc.ActiveView.Id).OfCategory(BuiltInCategory.OST_RvtLinks).ToElementIds()
+
+t = Transaction(doc,'Hide Links')
+t.Start()
+doc.ActiveView.HideElementsTemporary(collector)
+
+t.Commit()
 
 logger.reset_level()
