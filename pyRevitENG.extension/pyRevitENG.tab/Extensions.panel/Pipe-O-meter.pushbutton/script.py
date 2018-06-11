@@ -24,24 +24,4 @@ from Autodesk.Revit.UI import *
 app = __revit__.Application
 uidoc = __revit__.ActiveUIDocument
 
-
-def selectLinkedElement():
-    """Returns the id as an INT of an element selected from a Linked File
-    
-    Return: Element Id as int
-    """
-    #Import ObjectType
-    from Autodesk.Revit.UI.Selection import ObjectType
-    #Invoke selection method
-    choices = uidoc.Selection
-    #Execute method
-    hasPickOne = choices.PickObject(ObjectType.LinkedElement)
-    if hasPickOne is not None:
-        return hasPickOne.LinkedElementId.IntegerValue
-
-id = selectLinkedElement()
-#Copy id to clipboard
-script.clipboard_copy(str(id))
-TaskDialog.Show("Id",str(id))
-
 logger.reset_level()
