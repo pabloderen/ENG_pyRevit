@@ -41,6 +41,7 @@ app = __revit__.Application
 
 def SaveChangeJournal(sender, event):
     '''Save journal of elements changed during document edition'''
+    outputString = 'test'
     outputString= []
     docName = ""
     userName = ""
@@ -54,24 +55,25 @@ def SaveChangeJournal(sender, event):
     
     except:
         pass
-    
+    #Look for elements created in last event
     AddedElementsIds  = event.GetAddedElementIds()
     for i in AddedElementsIds:
         element= doc.GetElement(i)
         categoryName = element.Category.Name
         if  categoryName is "Pipes" or categoryName is "Duct":
-            comment = e.LookupParameter('Length').AsDouble()
-        s = "%s,%s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
+            comment = element.LookupParameter('Length').AsDouble()
+        s = "%s,%s, %s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
         outputString.append(s)
 
-    ModifiedElementsIds  = event.GetModifiedElementIds()
-    for i in ModifiedElementsIds:
-        element= doc.GetElement(i)
-        categoryName = element.Category.Name
-        if  categoryName is "Pipes" or categoryName is "Duct":
-            comment = e.LookupParameter('Length').AsDouble()
-        s = "%s,%s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
-        outputString.append(s)
+    # #Look for elements modified in last event
+    # ModifiedElementsIds  = event.GetModifiedElementIds()
+    # for i in ModifiedElementsIds:
+    #     element= doc.GetElement(i)
+    #     categoryName = element.Category.Name
+    #     if  categoryName is "Pipes" or categoryName is "Duct":
+    #         comment = element.LookupParameter('Length').AsDouble()
+    #     s = "%s,%s, %s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
+    #     outputString.append(s)
 
     ##TODO: find a way to retrieve delete element information
     # DeletedElementsIds  = event.GetDeletedElementIds()
@@ -79,16 +81,12 @@ def SaveChangeJournal(sender, event):
     #     s = "%s,%s, %s, %s, %s" % (date, userName, docName,"Deleted",str(i))
     #     outputString.append(s)
     
-    filepath = path.expanduser('~/Output.txt')
+    filepath = path.expanduser('~\Output.txt')
+    
     with open(filepath, "a") as text_file:
         for l in outputString:
+            print(l)
             text_file.write(l + "\n")
-
-
-
-#Execution
-app.DocumentChanged -= SaveChangeJournal
-
 
 app.DocumentChanged += SaveChangeJournal
 
