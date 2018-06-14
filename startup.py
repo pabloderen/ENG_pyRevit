@@ -33,22 +33,17 @@ import Autodesk.Revit.UI as UI
 import time
 from os import path
 
-
-
 app = __revit__.Application
-
-
 
 def SaveChangeJournal(sender, event):
     '''Save journal of elements changed during document edition'''
-    outputString = 'test'
+    
     outputString= []
     docName = ""
     userName = ""
     date = int(time.time())
     doc = __revit__.ActiveUIDocument.Document
     comment = ""
-    category = ""
     try:
         docName = doc.Title
         userName = app.Username
@@ -60,11 +55,16 @@ def SaveChangeJournal(sender, event):
     for i in AddedElementsIds:
         element= doc.GetElement(i)
         categoryName = element.Category.Name
-        if  categoryName is "Pipes" or categoryName is "Duct":
+        if "Pipes" in categoryName:
             comment = element.LookupParameter('Length').AsDouble()
-        s = "%s,%s, %s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
-        outputString.append(s)
+            s = "%s,%s, %s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
+            outputString.append(s)
+        elif "Pipe Fitting" in categoryName:
+            comment = element.LookupParameter('Size').AsString()
+            s = "%s,%s, %s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
+            outputString.append(s)
 
+    
     # #Look for elements modified in last event
     # ModifiedElementsIds  = event.GetModifiedElementIds()
     # for i in ModifiedElementsIds:
@@ -87,6 +87,7 @@ def SaveChangeJournal(sender, event):
         for l in outputString:
             print(l)
             text_file.write(l + "\n")
+        text_file.close()
 
 app.DocumentChanged += SaveChangeJournal
 
