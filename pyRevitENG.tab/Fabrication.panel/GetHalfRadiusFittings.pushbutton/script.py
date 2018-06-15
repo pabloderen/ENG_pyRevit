@@ -15,9 +15,11 @@ clr.AddReference('RevitAPIUI')
 from Autodesk.Revit.DB import * 
 from math import pi, degrees
 from System.Collections.Generic import List
+
 app = __revit__.Application
 uidoc = __revit__.ActiveUIDocument
-doc = app.ActiveDocument 
+doc = uidoc.Document
+
 logger = script.get_logger()
 logger.set_quiet_mode()
 
