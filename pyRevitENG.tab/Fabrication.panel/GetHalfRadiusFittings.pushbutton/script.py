@@ -35,7 +35,7 @@ def selectLinkedElement():
         angle = degrees(angle)
         diameter = element.get_Parameter(BuiltInParameter.FABRICATION_PART_DIAMETER_IN).AsDouble()
         radius = ((360/angle)*chord )/(pi*2)
-        print(diameter, radius, angle)
+        
         if round(radius,4) == round(diameter,4):
             wrongAngle.append(id)
 
