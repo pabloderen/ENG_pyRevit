@@ -7,7 +7,8 @@ pyrevit: 4.5
 """
 
 __title__ = 'Select FabParts with half radius'
-
+from pyrevit import script
+#Import pyRevit form library
 import clr
 clr.AddReference('RevitAPI') 
 clr.AddReference('RevitAPIUI') 
