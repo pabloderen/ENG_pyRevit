@@ -16,8 +16,14 @@ errors are printed from pyRevit commands.
 # with open(r'C:\Temp\test.txt', 'w') as f:
 #     f.write('test')
 
+
+
 from pyrevit.framework import clr
 
+import time
+import sqlite3
+import os
+from os import path
 
 clr.AddReference('RevitAPI')
 clr.AddReference('RevitAPIUI')
@@ -30,10 +36,15 @@ import Autodesk.Revit.DB.Events as Event
 
 import Autodesk.Revit.DB as DB
 import Autodesk.Revit.UI as UI
-import time
-from os import path
 
 app = __revit__.Application
+
+#Try to create the db if does not exists
+DBpath = os.path.expanduser(r'~\log.sqlite')
+conn = sqlite3.connect(DBpath)
+c = conn.cursor()
+c.execute('''CREATE TABLE IF NOT EXISTS elements
+                (date text, username text, document text, action text, id INTEGER, category text, length real, comment text )''')
 
 def SaveChangeJournal(sender, event):
     '''Save journal of elements changed during document edition'''
@@ -53,17 +64,22 @@ def SaveChangeJournal(sender, event):
     #Look for elements created in last event
     AddedElementsIds  = event.GetAddedElementIds()
     for i in AddedElementsIds:
+        action = "Added"
         element= doc.GetElement(i)
         categoryName = element.Category.Name
         if "Pipes" in categoryName:
-            comment = element.LookupParameter('Length').AsDouble()
-            s = "%s,%s, %s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
-            outputString.append(s)
+            length = element.LookupParameter('Length').AsDouble()
+            comment  = ""
+            c.execute("INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')"
+             % (date, userName, docName, action, i, categoryName, length, comment))
+            conn.commit()
         elif "Pipe Fitting" in categoryName:
+            length =0
             comment = element.LookupParameter('Size').AsString()
-            s = "%s,%s, %s, %s, %s, %s, %s" % (date, userName, docName,"Added",str(i),categoryName ,comment)
-            outputString.append(s)
-
+            c.execute("INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')"
+             % (date, userName, docName, action, i, categoryName, length, comment))
+            conn.commit()
+    conn.close()
     
     # #Look for elements modified in last event
     # ModifiedElementsIds  = event.GetModifiedElementIds()
@@ -81,13 +97,6 @@ def SaveChangeJournal(sender, event):
     #     s = "%s,%s, %s, %s, %s" % (date, userName, docName,"Deleted",str(i))
     #     outputString.append(s)
     
-    filepath = path.expanduser('~\Output.txt')
-    
-    with open(filepath, "a") as text_file:
-        for l in outputString:
-            print(l)
-            text_file.write(l + "\n")
-        text_file.close()
 
 app.DocumentChanged += SaveChangeJournal
 
