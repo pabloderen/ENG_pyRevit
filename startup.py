@@ -39,7 +39,40 @@ import Autodesk.Revit.UI as UI
 
 app = __revit__.Application
 
-#Try to create the db if does not exists
+
+
+def getElementsProperties(AddedElementsIds):
+    ''' '''
+    output= []
+    date = int(time.time())
+    doc = __revit__.ActiveUIDocument.Document
+    docName = doc.Title  or ""
+    userName = app.Username  or ""
+    action = "Added"
+    
+    uniqueIds = list(set(AddedElementsIds))
+
+    for id in uniqueIds:
+        element= doc.GetElement(id)
+        category = element.Category
+        categoryName = ''
+        try:
+            categoryName = category.Name
+            if "Pipes" in categoryName or "Ducts" in categoryName :
+                length = element.LookupParameter('Length').AsDouble()
+                comment  = ""
+                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
+                output.append(s)
+            if "Pipe Fitting" in categoryName or "Duct Fitting" in categoryName:
+                length = 0
+                comment  = element.LookupParameter('Size').AsString()
+                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
+                output.append(s)
+        except:
+            pass
+    return output
+
+
 
 
 def SaveChangeJournal(sender, event):
@@ -50,50 +83,21 @@ def SaveChangeJournal(sender, event):
     c.execute('''CREATE TABLE IF NOT EXISTS elements
                 (date text, username text, document text, action text, id INTEGER, category text, length real, comment text )''')
     try:
-        outputString= []
-        docName, categoryName , userName ,comment= "","","",""
-        
-        date = int(time.time())
-        doc = __revit__.ActiveUIDocument.Document
-        
-        
-        try:
-            docName = doc.Title
-            userName = app.Username
-        
-        except:
-            pass
         #Look for elements created in last event
         AddedElementsIds  = event.GetAddedElementIds()
-        for i in AddedElementsIds:
-            action = "Added"
-            element= doc.GetElement(i)
-            try:
-                categoryName = element.Category.Name
-            except:
-                pass
-            try:
-                if "Pipes" in categoryName:
-                    length = element.LookupParameter('Length').AsDouble()
-                    comment  = ""
-                    c.execute("INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')"
-                    % (date, userName, docName, action, i, categoryName, length, comment))
-                    conn.commit()
-                elif "Pipe Fitting" in categoryName:
-                    length =0
-                    comment = element.LookupParameter('Size').AsString()
-                    c.execute("INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')"
-                    % (date, userName, docName, action, i, categoryName, length, comment))
-                    conn.commit()
-            except:
-                pass
-        
+
+        queries = getElementsProperties(AddedElementsIds)
+        for q in queries:
+            c.execute(q)
+            conn.commit()
 
     except Exception as ex:
+
         erroLog = os.path.expanduser(r'~\error.log')
         with open(erroLog, 'a') as file:
-            file.write(str(ex))
-            #Closing the connections in case something fails
+            file.write(str(ex)+'\n')
+    
+    #Closing the connections in case something fails
     conn.close()       
         
 app.DocumentChanged += SaveChangeJournal
