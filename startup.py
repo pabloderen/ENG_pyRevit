@@ -70,6 +70,7 @@ def getElementsProperties(AddedElementsIds):
                 output.append(s)
         except:
             pass
+            
     return output
 
 
