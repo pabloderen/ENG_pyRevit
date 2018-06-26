@@ -60,7 +60,8 @@ for locationPoint in locations:
 
 # promt user for location
 from rpw.ui.forms import TextInput
-value = TextInput('Elements coordinates','Write X and Y coordinates of the object to be placed separeted with a comma', default="x,y")
+
+value = TextInput('Elements coordinates',description='Write X and Y coordinates of the object to be placed separeted with a comma', default="x,y")
 
 x= value.split(',')[0]
 y= value.split(',')[1]
