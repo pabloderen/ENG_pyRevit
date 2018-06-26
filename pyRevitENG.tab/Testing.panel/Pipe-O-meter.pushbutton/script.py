@@ -56,18 +56,15 @@ def createGraphic():
     
     conn.close()
 
+    #Today date to compare with data dates
     today = datetime.today().date() 
-    istoday = [x.date() == today for x in rows]
-
-    todayRow, todayData = [],[]
+    #Fill todayRow and todayData with
     
-    count = 0
+    todayList= [ (a,b) for a,b in zip(rows,data) if a.date() == today    ]
+    #    istoday = [x.date() == today for x in rows]
 
-    for i in istoday:
-        if i:
-            todayRow.append(str(rows[count]))
-            todayData.append(data[count])
-        count = count +1
+    todayRow = [x for x,y in todayList]
+    todayData = [y for x,y in todayList]
 
     average = TodayAaverage = 0
 
