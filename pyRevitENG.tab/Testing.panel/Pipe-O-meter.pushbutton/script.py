@@ -129,19 +129,19 @@ def createGraphic():
     
     #region Today History Chart
 
-    # TodayLineChart = output.make_line_chart()
-    # TodayLineChart.data.labels= todayRow
+    TodayLineChart = output.make_line_chart()
+    TodayLineChart.data.labels = [str(x) for x in todayRow] 
     
-    # Todayset_a = TodayLineChart.data.new_dataset('Today')
-    # Todayset_a.data = todayData
-    # Todayset_a.tension = 0
-    # TodayaverageData = TodayLineChart.data.new_dataset('Average')
-    # [TodayaverageData.data.append(TodayAaverage) for x in todayData]
+    Todayset_a = TodayLineChart.data.new_dataset('Today')
+    Todayset_a.data = todayData
+    Todayset_a.tension = 0
+    TodayaverageData = TodayLineChart.data.new_dataset('Average')
+    [TodayaverageData.data.append(TodayAaverage) for x in todayData]
     
-    # TodayLineChart.randomize_colors()
-    # TodayaverageData.backgroundColor = 'transparent'
+    TodayLineChart.randomize_colors()
+    #TodayaverageData.backgroundColor = 'transparent'
     
-    # TodayLineChart.options = optTodayLineChart
+    TodayLineChart.options = optTodayLineChart
     #endregion
 
     #region Doughnut Chart
@@ -153,12 +153,10 @@ def createGraphic():
     speed.backgroundColor = ["red", "grey"]
     speed.data = [round(average), 100-round(average)]
     #endregion
-    print(todayData)
-    print(todayRow)
-    print(rows)
+
     donutChart.draw()
 
-    # TodayLineChart.draw()
+    TodayLineChart.draw()
     
     LineChart.draw()
     
