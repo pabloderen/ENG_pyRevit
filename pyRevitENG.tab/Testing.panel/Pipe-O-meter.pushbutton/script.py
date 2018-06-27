@@ -139,7 +139,7 @@ def createGraphic():
     [TodayaverageData.data.append(TodayAaverage) for x in todayData]
     
     TodayLineChart.randomize_colors()
-    #TodayaverageData.backgroundColor = 'transparent'
+    TodayaverageData.backgroundColor = 'transparent'
     
     TodayLineChart.options = optTodayLineChart
     #endregion
