@@ -58,14 +58,15 @@ def createGraphic():
 
     #Today date to compare with data dates
     today = datetime.today().date() 
+
     #Fill todayRow and todayData with
     
     todayList= [ (a,b) for a,b in zip(rows,data) if a.date() == today    ]
-    #    istoday = [x.date() == today for x in rows]
-
+    
     todayRow = [x for x,y in todayList]
     todayData = [y for x,y in todayList]
-
+    
+    #Set averages to zero
     average = TodayAaverage = 0
 
     try:
@@ -73,7 +74,7 @@ def createGraphic():
         TodayAaverage = sum(todayData)/len(todayData)
     except:
         pass
-
+    #region CHART options
     optLinearChart = {
             
             'scales': {
@@ -109,7 +110,8 @@ def createGraphic():
                }
             }]
          }}
-    
+    #endregion
+
     #region History Chart
     LineChart = output.make_line_chart()
     LineChart.options = optLinearChart
@@ -127,19 +129,19 @@ def createGraphic():
     
     #region Today History Chart
 
-    TodayLineChart = output.make_line_chart()
-    TodayLineChart.data.labels= todayRow
+    # TodayLineChart = output.make_line_chart()
+    # TodayLineChart.data.labels= todayRow
     
-    Todayset_a = TodayLineChart.data.new_dataset('Today')
-    Todayset_a.data = todayData
-    Todayset_a.tension = 0
-    TodayaverageData = TodayLineChart.data.new_dataset('Average')
-    [TodayaverageData.data.append(TodayAaverage) for x in todayData]
+    # Todayset_a = TodayLineChart.data.new_dataset('Today')
+    # Todayset_a.data = todayData
+    # Todayset_a.tension = 0
+    # TodayaverageData = TodayLineChart.data.new_dataset('Average')
+    # [TodayaverageData.data.append(TodayAaverage) for x in todayData]
     
-    TodayLineChart.randomize_colors()
-    TodayaverageData.backgroundColor = 'transparent'
+    # TodayLineChart.randomize_colors()
+    # TodayaverageData.backgroundColor = 'transparent'
     
-    TodayLineChart.options = optTodayLineChart
+    # TodayLineChart.options = optTodayLineChart
     #endregion
 
     #region Doughnut Chart
@@ -151,24 +153,15 @@ def createGraphic():
     speed.backgroundColor = ["red", "grey"]
     speed.data = [round(average), 100-round(average)]
     #endregion
-
-    
+    print(todayData)
+    print(todayRow)
+    print(rows)
     donutChart.draw()
 
-    TodayLineChart.draw()
+    # TodayLineChart.draw()
     
     LineChart.draw()
     
-#calcular vleocidad de modelado de pipe
-#cuantos metros se modelo en 10 minutos proyectado a 1 hora (x*6)    
-
-    
-
-# def lengthLatHour(dates, lengths):
-
-#     lastHourDateTime = datetime.datetime.now() - datetime.timedelta(hours = 1)
-    
-#      lengthfor date, length in zip(dates,lengths) if date > lastHourDateTime
 
 
 createGraphic()
