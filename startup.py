@@ -53,7 +53,7 @@ def getElementsProperties(AddedElementsIds, connection):
     uniqueIds = list(set(AddedElementsIds))
 
     for id in uniqueIds:
-        test = "SELECT EXISTS(SELECT 1 FROM myTbl WHERE id='%s' LIMIT 1);" % (id)
+        test = "SELECT EXISTS(SELECT 1 FROM elements WHERE id='%s' LIMIT 1);" % (id)
         if not connection.execute(test):
             element= doc.GetElement(id)
             category = element.Category
@@ -70,8 +70,10 @@ def getElementsProperties(AddedElementsIds, connection):
                     comment  = element.LookupParameter('Size').AsString()
                     s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
                     output.append(s)
-            except:
-                pass
+            except Exception as ex:
+                erroLog = os.path.expanduser(r'~\error.log')
+                with open(erroLog, 'a') as file:
+                    file.write(str(ex)+'\n')
             
     return output
 
