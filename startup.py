@@ -41,7 +41,7 @@ app = __revit__.Application
 
 
 
-def getElementsProperties(AddedElementsIds):
+def getElementsProperties(AddedElementsIds, connection):
     ''' '''
     output= []
     date = int(time.time())
@@ -53,23 +53,25 @@ def getElementsProperties(AddedElementsIds):
     uniqueIds = list(set(AddedElementsIds))
 
     for id in uniqueIds:
-        element= doc.GetElement(id)
-        category = element.Category
-        categoryName = ''
-        try:
-            categoryName = category.Name
-            if "Pipes" in categoryName or "Ducts" in categoryName :
-                length = element.LookupParameter('Length').AsDouble()
-                comment  = ""
-                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
-                output.append(s)
-            if "Pipe Fitting" in categoryName or "Duct Fitting" in categoryName:
-                length = 0
-                comment  = element.LookupParameter('Size').AsString()
-                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
-                output.append(s)
-        except:
-            pass
+        test = "SELECT EXISTS(SELECT 1 FROM myTbl WHERE id='%s' LIMIT 1);" % (id)
+        if not connection.execute(test):
+            element= doc.GetElement(id)
+            category = element.Category
+            categoryName = ''
+            try:
+                categoryName = category.Name
+                if "Pipes" in categoryName or "Ducts" in categoryName :
+                    length = element.LookupParameter('Length').AsDouble()
+                    comment  = ""
+                    s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
+                    output.append(s)
+                if "Pipe Fitting" in categoryName or "Duct Fitting" in categoryName:
+                    length = 0
+                    comment  = element.LookupParameter('Size').AsString()
+                    s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
+                    output.append(s)
+            except:
+                pass
             
     return output
 
@@ -84,11 +86,12 @@ def SaveChangeJournal(sender, event):
     c.execute('''CREATE TABLE IF NOT EXISTS elements
                 (date text, username text, document text, action text, id INTEGER, category text, length real, comment text )''')
     try:
-        #Look for elements created in last event
-        AddedElementsIds  = event.GetAddedElementIds()
+        #Look for elements created in last event and cleaning from duplicated values
+        AddedElementsIds  = list(set(event.GetAddedElementIds()))
 
-        queries = getElementsProperties(AddedElementsIds)
+        queries = getElementsProperties(AddedElementsIds,c)
         for q in queries:
+            
             c.execute(q)
             conn.commit()
 

@@ -1,12 +1,12 @@
 """
-Pipe-O-meter
-Version: 1.5
-Date : 06/10/18
+Duct-O-meter
+Version: 1.0
+Date : 06/28/18
 Autor: Pablo Derendinger 
 pyrevit: 4.5
 """
 
-__title__ = 'Pipe-O-meter'
+__title__ = 'Duct-O-meter'
 
 
 from pyrevit import script
@@ -48,8 +48,8 @@ def createGraphic():
     conn = sqlite3.connect(DBpath)
 
     #Define labes, data , average and maximum
-    labelsQuery = conn.execute("SELECT date FROM elements WHERE category LIKE '%s'" %('Pipes') )
-    dataQuery = conn.execute("SELECT length FROM elements WHERE category LIKE '%s'" %('Pipes'))
+    labelsQuery = conn.execute("SELECT date FROM elements WHERE category LIKE '%s'" %('Ducts') )
+    dataQuery = conn.execute("SELECT length FROM elements WHERE category LIKE '%s'" %('Ducts'))
     
     rows=[getDateFromUnix(x[0]) for x in labelsQuery] 
     data = [row[0] for row in dataQuery]
@@ -126,7 +126,7 @@ def createGraphic():
     optDouhgtChart = {
             
                 'display': True,
-                'text':'%s\' of pipes per hour' % round(lastHourAverage, 2) ,
+                'text':'%s\' ducts per hour' % round(lastHourAverage, 2) ,
                 'fontSize' : 30,
                 'padding' : 10, 
                 'wrap':True
