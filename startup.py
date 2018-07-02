@@ -53,26 +53,25 @@ def getElementsProperties(AddedElementsIds, connection):
     uniqueIds = list(set(AddedElementsIds))
 
     for id in uniqueIds:
-        test = "SELECT EXISTS(SELECT 1 FROM elements WHERE id='%s' LIMIT 1);" % (id)
-        if not connection.execute(test):
-            element= doc.GetElement(id)
-            category = element.Category
-            categoryName = ''
-            try:
-                categoryName = category.Name
-                if "Pipes" in categoryName or "Ducts" in categoryName :
-                    length = element.LookupParameter('Length').AsDouble()
-                    comment  = ""
-                    s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
-                    output.append(s)
-                if "Pipe Fitting" in categoryName or "Duct Fitting" in categoryName:
-                    length = 0
-                    comment  = element.LookupParameter('Size').AsString()
-                    s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
-                    output.append(s)
-            except Exception as ex:
-                erroLog = os.path.expanduser(r'~\error.log')
-                with open(erroLog, 'a') as file:
+
+        element= doc.GetElement(id)
+        category = element.Category
+        categoryName = ''
+        try:
+            categoryName = category.Name
+            if "Pipes" in categoryName or "Ducts" in categoryName :
+                length = element.LookupParameter('Length').AsDouble()
+                comment  = ""
+                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
+                output.append(s)
+            if "Pipe Fitting" in categoryName or "Duct Fitting" in categoryName:
+                length = 0
+                comment  = element.LookupParameter('Size').AsString()
+                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
+                output.append(s)
+        except Exception as ex:
+            erroLog = os.path.expanduser(r'~\error.log')
+            with open(erroLog, 'a') as file:
                     file.write(str(ex)+'\n')
             
     return output
