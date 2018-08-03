@@ -1,12 +1,12 @@
 """
-Changes Family/Types names to uppercase
+Names to uppercase
 Version: 1.0
 Date : 06/08/18
 Autor: Pablo Derendinger 
 pyrevit: 4.5
 """
 
-__title__ = 'Changes Family Name'
+__title__ = 'Family to UPPER'
 
 
 from pyrevit import script

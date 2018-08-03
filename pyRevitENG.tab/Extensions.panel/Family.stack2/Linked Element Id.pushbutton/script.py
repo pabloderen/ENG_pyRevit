@@ -6,7 +6,7 @@ Autor: Pablo Derendinger
 pyrevit: 4.5
 """
 
-__title__ = 'Get Linked element id'
+__title__ = 'Linked element Id'
 
 
 from pyrevit import script

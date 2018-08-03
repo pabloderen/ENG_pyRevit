@@ -35,6 +35,7 @@ clr.AddReference('Newtonsoft.Json')
 import Autodesk.Revit.DB.Events as Event
 
 import Autodesk.Revit.DB as DB
+from Autodesk.Revit.DB import *
 import Autodesk.Revit.UI as UI
 
 app = __revit__.Application
@@ -62,12 +63,20 @@ def getElementsProperties(AddedElementsIds, connection):
             if "Pipes" in categoryName or "Ducts" in categoryName :
                 length = element.LookupParameter('Length').AsDouble()
                 comment  = ""
-                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
+                SystemType = element.get_Parameter(DB.BuiltInParameter.RBS_PIPING_SYSTEM_TYPE_PARAM).AsValueString()
+                #SystemTypeName = SystemType.LookupParameter('Name')
+                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment, SystemType)
                 output.append(s)
             if "Pipe Fitting" in categoryName or "Duct Fitting" in categoryName:
                 length = 0
                 comment  = element.LookupParameter('Size').AsString()
-                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s')" % (date, userName, docName, action, id, categoryName, length, comment)
+                try:
+                    SystemType = element.get_Parameter(DB.BuiltInParameter.RBS_PIPING_SYSTEM_TYPE_PARAM).AsValueString()
+                except:
+                    SystemType = element.get_Parameter(DB.BuiltInParameter.RBS_DUCT_SYSTEM_TYPE_PARAM).AsValueString()
+                    
+                #SystemTypeName = SystemType.LookupParameter('Name')
+                s ="INSERT INTO elements VALUES ('%s','%s','%s','%s',%s,'%s',%s,'%s','%s')" % (date, userName, docName, action, id, categoryName, length, comment, SystemType)
                 output.append(s)
         except Exception as ex:
             erroLog = os.path.expanduser(r'~\error.log')
@@ -85,7 +94,7 @@ def SaveChangeJournal(sender, event):
     conn = sqlite3.connect(DBpath)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS elements
-                (date text, username text, document text, action text, id INTEGER, category text, length real, comment text )''')
+                (date text, username text, document text, action text, id INTEGER, category text, length real, comment text, system text )''')
     try:
         #Look for elements created in last event and cleaning from duplicated values
         AddedElementsIds  = list(set(event.GetAddedElementIds()))
