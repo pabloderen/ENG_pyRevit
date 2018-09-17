@@ -10,12 +10,14 @@ grids = DB.FilteredElementCollector(revit.doc)\
           .OfCategory(DB.BuiltInCategory.OST_Grids)\
           .WhereElementIsNotElementType().ToElements()
 
-try:
-    with revit.Transaction('Hide Grid Bubbles'):
-        for grid in grids:
+
+with revit.Transaction('Hide Grid Bubbles'):
+    
+    for grid in grids:
+        try:
             grid.HideBubbleInView(DB.DatumEnds.End0, revit.activeview)
             grid.HideBubbleInView(DB.DatumEnds.End1, revit.activeview)
-except Exception:
-    pass
+        except Exception:
+            pass
 
 revit.uidoc.RefreshActiveView()
